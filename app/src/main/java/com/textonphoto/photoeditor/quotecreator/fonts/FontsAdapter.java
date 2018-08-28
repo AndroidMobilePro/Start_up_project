@@ -22,11 +22,6 @@ import java.util.ArrayList;
  */
 
 public class FontsAdapter extends RecyclerView.Adapter<FontsAdapter.ViewHolder> {
-    //    private static String sFonts[] = {"Amatic-Bold.ttf", "armalite_rifle.ttf", "black_jack.ttf", "Capture_it.ttf",
-//            "CODE Bold.otf", "EraserRegular.ttf", "GrandHotel-Regular.otf", "impact2.otf", "KaushanScript-Regular.otf",
-//            "LDFComicSans.ttf", "Lobster_1.3.otf", "LobsterTwo-Bold.otf", "Pacifico.ttf", "quick_end_jerk.ttf",
-//            "Top_Secret.ttf", "TrashHand.ttf", "troika.otf"};
-//    private static final ArrayList<String> sArrayString = new ArrayList<>();
     private static final ArrayList<String> fonts = new ArrayList<>();
 
     private Context context;
@@ -36,18 +31,12 @@ public class FontsAdapter extends RecyclerView.Adapter<FontsAdapter.ViewHolder> 
     public FontsAdapter(@NonNull Context context) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
-//        sArrayString.clear();
-//        for (int i = 0; i < sFonts.length; i++) {
-//            sArrayString.add(sFonts[i]);
-//        }
-
         final AssetManager assetManager = context.getAssets();
         try {
             String[] filelistInSubfolder = assetManager.list(Contants.folderFont);
             for (int i = 0; i < filelistInSubfolder.length; i++) {
                 // Get filename of file or directory
                 String filename = filelistInSubfolder[i];
-                Log.d("TAGGG", filename);
                 fonts.add(filename);
             }
 
@@ -83,14 +72,14 @@ public class FontsAdapter extends RecyclerView.Adapter<FontsAdapter.ViewHolder> 
         public ViewHolder(final View itemView) {
             super(itemView);
             fontsPickerView = itemView.findViewById(R.id.fonts_picker_view);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (onTextPickerClickListener != null) {
-                        onTextPickerClickListener.onTextPickerClickListener(fonts.get(getAdapterPosition()));
-                    }
-                }
-            });
+//            fontsPickerView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (onTextPickerClickListener != null) {
+//                        onTextPickerClickListener.onTextPickerClickListener(fonts.get(getAdapterPosition()));
+//                    }
+//                }
+//            });
         }
     }
 

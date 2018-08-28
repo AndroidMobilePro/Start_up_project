@@ -8,6 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="actionBarSize">0dp</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:tabWidgetStyle">@style/MyTabLayoutTextAppearance</item>
     </style>
 
+
+    <style name="MyTabLayoutTextAppearance" parent="TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
 </resources>

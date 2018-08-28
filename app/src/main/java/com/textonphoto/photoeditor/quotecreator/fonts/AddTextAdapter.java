@@ -1,4 +1,4 @@
-package com.textonphoto.photoeditor.quotecreator;
+package com.textonphoto.photoeditor.quotecreator.fonts;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.textonphoto.photoeditor.quotecreator.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,13 +20,13 @@ import java.util.List;
  * @version 0.1.2
  * @since 5/23/2018
  */
-public class EditViewAdapter extends RecyclerView.Adapter<EditViewAdapter.ViewHolder> {
+public class AddTextAdapter extends RecyclerView.Adapter<AddTextAdapter.ViewHolder> {
 
     private Context context;
     private List<String> list = new ArrayList<>();
     private EditViewListener mEditViewListener;
 
-    public EditViewAdapter(Context context) {
+    public AddTextAdapter(Context context) {
         this.context = context;
         list.add("FORMAT");
         list.add("FONT");
@@ -37,7 +39,7 @@ public class EditViewAdapter extends RecyclerView.Adapter<EditViewAdapter.ViewHo
         list.add("BLUR");
     }
 
-    public EditViewAdapter(Context context, EditViewListener editViewListener) {
+    public AddTextAdapter(Context context, EditViewListener editViewListener) {
         this(context);
         this.mEditViewListener = editViewListener;
     }
