@@ -24,7 +24,9 @@ import com.textonphoto.photoeditor.quotecreator.filter.FilterFragment;
 import com.textonphoto.photoeditor.quotecreator.fonts.AddTextAdapter;
 import com.textonphoto.photoeditor.quotecreator.fonts.AddTextFragment;
 import com.textonphoto.photoeditor.quotecreator.fonts.FontsFragment;
+import com.textonphoto.photoeditor.quotecreator.image.ImageFragment;
 import com.textonphoto.photoeditor.quotecreator.stickers.StickersFragment;
+import com.textonphoto.photoeditor.quotecreator.views.PhotoEditorView;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
 
     //    private View viewTextBottom;
     private ImageView addText;
-    private ImageView drawView;
+    private PhotoEditorView drawView;
 
     private RecyclerView lineRow;
 
@@ -58,9 +60,13 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
+    private View llSave;
+    private View viewHome;
+
     private void setupTabIcons() {
 
         int[] tabIcons = {
+                R.drawable.ic_camera_2,
                 R.drawable.ic_gallery,
                 R.drawable.ic_brush,
                 R.drawable.ic_text,
@@ -75,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
         tabLayout.getTabAt(3).setIcon(tabIcons[3]);
         tabLayout.getTabAt(4).setIcon(tabIcons[4]);
         tabLayout.getTabAt(5).setIcon(tabIcons[5]);
+        tabLayout.getTabAt(6).setIcon(tabIcons[6]);
 
 //        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
 //        tabOne.setText("ONE");
@@ -85,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new ImageFragment(), "Canvas");
         adapter.addFragment(new BackgroundFragment(), "Background");
         adapter.addFragment(new BrushFragment(), "Brush");
         adapter.addFragment(new FontsFragment(), "Text");
@@ -107,6 +115,22 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
+
+        llSave = findViewById(R.id.llSave);
+        llSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        viewHome = findViewById(R.id.viewHome);
+        viewHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         fragmentManager = getSupportFragmentManager();
 

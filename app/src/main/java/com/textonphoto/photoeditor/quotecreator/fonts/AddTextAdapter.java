@@ -14,12 +14,6 @@ import com.textonphoto.photoeditor.quotecreator.R;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * @author <a href="https://github.com/burhanrashid52">Burhanuddin Rashid</a>
- * @version 0.1.2
- * @since 5/23/2018
- */
 public class AddTextAdapter extends RecyclerView.Adapter<AddTextAdapter.ViewHolder> {
 
     private Context context;

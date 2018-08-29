@@ -19,9 +19,10 @@ public class StickersFragment extends Fragment {
 
 
     private RecyclerView stickerRecyclerView;
-    private FontsAdapter fontsAdapter;
+    private StickerAdapter stickerAdapter;
 
     private ImageView showMore;
+
     public StickersFragment() {
         // Required empty public constructor
     }
@@ -46,13 +47,13 @@ public class StickersFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stickers, container, false);
 
-        fontsAdapter = new FontsAdapter(getActivity());
+        stickerAdapter = new StickerAdapter(getActivity());
         stickerRecyclerView = view.findViewById(R.id.sticker_recycler_view);
         LinearLayoutManager layoutEditManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         stickerRecyclerView.setLayoutManager(layoutEditManager);
         stickerRecyclerView.setHasFixedSize(true);
         //This listener will change the text fonts when clicked on any fonts
-        stickerRecyclerView.setAdapter(fontsAdapter);
+        stickerRecyclerView.setAdapter(stickerAdapter);
 
         showMore = view.findViewById(R.id.showMore);
         showMore.setOnClickListener(new View.OnClickListener() {

@@ -19,7 +19,7 @@ import com.textonphoto.photoeditor.quotecreator.fonts.FontsAdapter;
 public class BackgroundFragment extends Fragment {
 
     private RecyclerView backgroundRecyclerView;
-    private FontsAdapter fontsAdapter;
+    private BackgroudAdapter backgroudAdapter;
     private ImageView showMore;
 
     private OnBackgroundListener onBackgroundListener;
@@ -47,13 +47,14 @@ public class BackgroundFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_background, container, false);
-        fontsAdapter = new FontsAdapter(getActivity());
+        backgroudAdapter = new BackgroudAdapter(getActivity());
+
         backgroundRecyclerView = view.findViewById(R.id.background_recycler_view);
         LinearLayoutManager layoutEditManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         backgroundRecyclerView.setLayoutManager(layoutEditManager);
         backgroundRecyclerView.setHasFixedSize(true);
         //This listener will change the text fonts when clicked on any fonts
-        backgroundRecyclerView.setAdapter(fontsAdapter);
+        backgroundRecyclerView.setAdapter(backgroudAdapter);
 
         showMore = view.findViewById(R.id.showMore);
         showMore.setOnClickListener(new View.OnClickListener() {

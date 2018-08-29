@@ -17,10 +17,6 @@ import com.textonphoto.photoeditor.quotecreator.constants.Contants;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Created by Ahmed Adel on 5/8/17.
- */
-
 public class FontsAdapter extends RecyclerView.Adapter<FontsAdapter.ViewHolder> {
     private static final ArrayList<String> fonts = new ArrayList<>();
 

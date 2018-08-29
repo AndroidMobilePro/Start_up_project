@@ -18,7 +18,7 @@ public class EmojiFragment extends Fragment {
     private OnEmojiListener onEmojiListener;
 
     private RecyclerView emojiRecyclerView;
-    private FontsAdapter fontsAdapter;
+    private EmojiAdapter emojiAdapter;
 
     private ImageView showMore;
 
@@ -46,13 +46,13 @@ public class EmojiFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_emoji, container, false);
 
-        fontsAdapter = new FontsAdapter(getActivity());
+        emojiAdapter = new EmojiAdapter(getActivity());
         emojiRecyclerView = view.findViewById(R.id.emoji_recycler_view);
         LinearLayoutManager layoutEditManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         emojiRecyclerView.setLayoutManager(layoutEditManager);
         emojiRecyclerView.setHasFixedSize(true);
         //This listener will change the text fonts when clicked on any fonts
-        emojiRecyclerView.setAdapter(fontsAdapter);
+        emojiRecyclerView.setAdapter(emojiAdapter);
 
         showMore = view.findViewById(R.id.showMore);
         showMore.setOnClickListener(new View.OnClickListener() {

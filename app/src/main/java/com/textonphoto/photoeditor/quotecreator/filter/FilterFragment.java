@@ -16,7 +16,7 @@ public class FilterFragment extends Fragment {
     private OnFilterListener onFilterListener;
 
     private RecyclerView filterRecyclerView;
-    private FontsAdapter fontsAdapter;
+    private FilterAdapter filterAdapter;
     public FilterFragment() {
         // Required empty public constructor
     }
@@ -26,7 +26,7 @@ public class FilterFragment extends Fragment {
         return fragment;
     }
 
-    public void setBrushListener(OnFilterListener onFilterListener) {
+    public void setFilterListener(OnFilterListener onFilterListener) {
         this.onFilterListener = onFilterListener;
     }
 
@@ -40,13 +40,13 @@ public class FilterFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_filter, container, false);
-        fontsAdapter = new FontsAdapter(getActivity());
+        filterAdapter = new FilterAdapter(getActivity());
         filterRecyclerView = view.findViewById(R.id.filter_recycler_view);
         LinearLayoutManager layoutEditManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         filterRecyclerView.setLayoutManager(layoutEditManager);
         filterRecyclerView.setHasFixedSize(true);
         //This listener will change the text fonts when clicked on any fonts
-        filterRecyclerView.setAdapter(fontsAdapter);
+        filterRecyclerView.setAdapter(filterAdapter);
         return view;
     }
 

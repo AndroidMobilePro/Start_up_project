@@ -10,12 +10,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * @author <a href="https://github.com/burhanrashid52">Burhanuddin Rashid</a>
- * @version 0.1.2
- * @since 5/23/2018
- */
 public class EditingToolssAdapter extends RecyclerView.Adapter<EditingToolssAdapter.ViewHolder> {
 
     private List<ToolModel> mToolList = new ArrayList<>();
