@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.textonphoto.photoeditor.quotecreator.R;
-import com.textonphoto.photoeditor.quotecreator.fonts.FontsAdapter;
 
 public class EmojiFragment extends Fragment {
 

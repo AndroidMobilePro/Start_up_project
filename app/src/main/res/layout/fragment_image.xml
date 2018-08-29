@@ -7,7 +7,7 @@
     android:gravity="center_horizontal"
     android:orientation="horizontal"
     android:padding="10dp"
-    tools:context="com.textonphoto.photoeditor.quotecreator.fonts.FontsFragment">
+    tools:context="com.textonphoto.photoeditor.quotecreator.edit_text.FontsFragment">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -57,7 +57,7 @@
             android:layout_below="@+id/imageViewCamera"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="6dp"
-            android:text="Gallery"
+            android:text="Camera"
             android:textColor="@android:color/darker_gray" />
 
     </RelativeLayout>
@@ -74,14 +74,13 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_picture" />
 
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/imageViewGallery"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="6dp"
-            android:text="Camera"
+            android:text="Gallery"
             android:textColor="@android:color/darker_gray" />
     </RelativeLayout>
 </LinearLayout>

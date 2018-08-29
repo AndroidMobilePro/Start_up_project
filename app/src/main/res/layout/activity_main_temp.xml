@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff"
@@ -58,16 +59,16 @@
     </RelativeLayout>
 
     <com.textonphoto.photoeditor.quotecreator.views.PhotoEditorView
-        android:id="@+id/drawView"
+        android:id="@+id/photoEditorView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="30dp"
         android:scaleType="fitXY"
-        app:photo_src="@drawable/got_s"
+        app:layout_constraintBottom_toTopOf="@+id/viewpager"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/viewpager"
-        app:layout_constraintTop_toBottomOf="@+id/appBar" />
+        app:layout_constraintTop_toBottomOf="@+id/appBar"
+        app:photo_src="@drawable/got_s" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/lineTools"
@@ -100,63 +101,45 @@
         app:tabMode="scrollable"
         app:tabSelectedTextColor="@color/colorTextHeaderSelect"
         app:tabTextColor="@color/colorTextHeader" />
-    <!--</LinearLayout>-->
 
-    <FrameLayout
-        android:id="@+id/frContainer"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/textViewpager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:background="@color/white"
-        android:orientation="horizontal"
-        android:paddingBottom="10dp"
         android:visibility="invisible"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/containerTextTabs"
         tools:visibility="visible" />
 
-    <FrameLayout
-        android:id="@+id/frContainerBacground"
+    <LinearLayout
+        android:id="@+id/containerTextTabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingBottom="10dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible" />
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <FrameLayout
-        android:id="@+id/frContainerAddText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="horizontal"
-        android:paddingBottom="10dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible" />
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:src="@drawable/ic_back" />
 
-
-    <FrameLayout
-        android:id="@+id/frContainerBrush"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="horizontal"
-        android:paddingBottom="10dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible" />
-
-    <FrameLayout
-        android:id="@+id/frContainerSticker"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="horizontal"
-        android:paddingBottom="10dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible" />
+        <android.support.design.widget.TabLayout
+            android:id="@+id/textTabs"
+            style="@style/MyTabLayoutTextAppearance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabGravity="fill"
+            app:tabMode="scrollable"
+            app:tabSelectedTextColor="@color/colorTextHeaderSelect"
+            app:tabTextColor="@color/colorTextHeader"
+            tools:visibility="visible" />
+    </LinearLayout>
 
 
 </android.support.constraint.ConstraintLayout>

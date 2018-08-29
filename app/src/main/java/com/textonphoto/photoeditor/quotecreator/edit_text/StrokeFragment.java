@@ -1,4 +1,4 @@
-package com.textonphoto.photoeditor.quotecreator.stickers;
+package com.textonphoto.photoeditor.quotecreator.edit_text;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,27 +12,25 @@ import android.widget.Toast;
 
 import com.textonphoto.photoeditor.quotecreator.R;
 
-public class StickersFragment extends Fragment {
+public class StrokeFragment extends Fragment {
 
-    private OnStickersListener onStickersListener;
-
-
-    private RecyclerView stickerRecyclerView;
-    private StickerAdapter stickerAdapter;
-
+    private RecyclerView backgroundRecyclerView;
+    private FormatAdapter backgroudAdapter;
     private ImageView showMore;
 
-    public StickersFragment() {
+    private OnBackgroundListener onBackgroundListener;
+
+    public StrokeFragment() {
         // Required empty public constructor
     }
 
-    public static StickersFragment newInstance() {
-        StickersFragment fragment = new StickersFragment();
+    public static StrokeFragment newInstance() {
+        StrokeFragment fragment = new StrokeFragment();
         return fragment;
     }
 
-    public void setStickersListener(OnStickersListener onStickersListener) {
-        this.onStickersListener = onStickersListener;
+    public void setBackgroudListener(OnBackgroundListener onBackgroundListener) {
+        this.onBackgroundListener = onBackgroundListener;
     }
 
     @Override
@@ -44,15 +42,15 @@ public class StickersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_stickers, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_text_stroke, container, false);
+        backgroudAdapter = new FormatAdapter(getActivity());
 
-        stickerAdapter = new StickerAdapter(getActivity());
-        stickerRecyclerView = view.findViewById(R.id.sticker_recycler_view);
+        backgroundRecyclerView = view.findViewById(R.id.background_recycler_view);
         LinearLayoutManager layoutEditManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        stickerRecyclerView.setLayoutManager(layoutEditManager);
-        stickerRecyclerView.setHasFixedSize(true);
+        backgroundRecyclerView.setLayoutManager(layoutEditManager);
+        backgroundRecyclerView.setHasFixedSize(true);
         //This listener will change the text fonts when clicked on any fonts
-        stickerRecyclerView.setAdapter(stickerAdapter);
+        backgroundRecyclerView.setAdapter(backgroudAdapter);
 
         showMore = view.findViewById(R.id.showMore);
         showMore.setOnClickListener(new View.OnClickListener() {
@@ -65,7 +63,7 @@ public class StickersFragment extends Fragment {
     }
 
 
-    static public interface OnStickersListener {
-        void onStickersChoose();
+    static public interface OnBackgroundListener {
+        void onBackgroundChoose();
     }
 }

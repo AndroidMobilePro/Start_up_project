@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.textonphoto.photoeditor.quotecreator.R;
-import com.textonphoto.photoeditor.quotecreator.fonts.FontsAdapter;
 
 public class FilterFragment extends Fragment {
 

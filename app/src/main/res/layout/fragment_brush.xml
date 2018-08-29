@@ -10,7 +10,7 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/center"
         android:scaleType="centerCrop"
-        android:src="@drawable/ocean" />
+        android:src="@drawable/ic_item_bacground" />
 
     <ImageView
         android:id="@+id/center"
@@ -20,7 +20,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ocean" />
+        android:src="@drawable/ic_item_bacground" />
 
     <ImageView
         android:layout_width="100dp"
@@ -28,5 +28,5 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/center"
         android:scaleType="centerCrop"
-        android:src="@drawable/ocean" />
+        android:src="@drawable/ic_item_bacground" />
 </RelativeLayout>

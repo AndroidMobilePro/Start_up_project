@@ -50,6 +50,9 @@ public class ImageFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getActivity(), "show picture", Toast.LENGTH_SHORT).show();
+                if (onImageListener != null) {
+                    onImageListener.onImageBackgroundChoose();
+                }
             }
         });
 
@@ -57,6 +60,9 @@ public class ImageFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getActivity(), "show camera", Toast.LENGTH_SHORT).show();
+                if (onImageListener != null) {
+                    onImageListener.onImageCameraChoose();
+                }
             }
         });
 
@@ -64,6 +70,9 @@ public class ImageFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getActivity(), "show gallery", Toast.LENGTH_SHORT).show();
+                if (onImageListener != null) {
+                    onImageListener.onImageGalleryChoose();
+                }
             }
         });
         return view;
@@ -71,6 +80,8 @@ public class ImageFragment extends Fragment {
 
 
     static public interface OnImageListener {
-        void onImageChoose();
+        void onImageBackgroundChoose();
+        void onImageCameraChoose();
+        void onImageGalleryChoose();
     }
 }

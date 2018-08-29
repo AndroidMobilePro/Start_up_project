@@ -1,11 +1,10 @@
-package com.textonphoto.photoeditor.quotecreator.fonts;
+package com.textonphoto.photoeditor.quotecreator.edit_text;
 
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

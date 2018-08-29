@@ -1,7 +1,6 @@
-package com.textonphoto.photoeditor.quotecreator.fonts;
+package com.textonphoto.photoeditor.quotecreator.edit_text;
 
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.textonphoto.photoeditor.quotecreator.R;
 import com.textonphoto.photoeditor.quotecreator.constants.Contants;
@@ -16,9 +16,11 @@ import com.textonphoto.photoeditor.quotecreator.constants.Contants;
 public class FontsFragment extends Fragment {
 
     private RecyclerView fontTextRecyclerView;
+    private ImageView showMore;
     private FontsAdapter fontsAdapter;
     private Typeface mTypeface;
     private OnFontListener onFontListener;
+    private FontsBSFragment fontsBSFragment;
 
     public FontsFragment() {
         // Required empty public constructor
@@ -56,6 +58,23 @@ public class FontsFragment extends Fragment {
         fontTextRecyclerView.setHasFixedSize(true);
         //This listener will change the text fonts when clicked on any fonts
         fontTextRecyclerView.setAdapter(fontsAdapter);
+
+        fontsBSFragment = new FontsBSFragment();
+        showMore = view.findViewById(R.id.showMore);
+        showMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fontsBSFragment.show(getActivity().getSupportFragmentManager(), fontsBSFragment.getTag());
+                fontsBSFragment.setFontListener(new FontsBSFragment.FontsListener() {
+                    @Override
+                    public void onFontClick(String fonts) {
+                        mTypeface = Typeface.createFromAsset(getActivity().getAssets(),
+                                Contants.folderFontPath + fonts);
+                    }
+                });
+            }
+        });
+
         return view;
     }
 

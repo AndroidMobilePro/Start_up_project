@@ -1,67 +1,85 @@
 package com.textonphoto.photoeditor.quotecreator;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.textonphoto.photoeditor.quotecreator.background.BackgroundFragment;
+import com.textonphoto.photoeditor.quotecreator.base.BaseActivity;
 import com.textonphoto.photoeditor.quotecreator.brush.BrushFragment;
+import com.textonphoto.photoeditor.quotecreator.constants.Contants;
+import com.textonphoto.photoeditor.quotecreator.edit_text.BlurFragment;
+import com.textonphoto.photoeditor.quotecreator.edit_text.ColorFragment;
+import com.textonphoto.photoeditor.quotecreator.edit_text.FormatFragment;
+import com.textonphoto.photoeditor.quotecreator.edit_text.HighLightFragment;
+import com.textonphoto.photoeditor.quotecreator.edit_text.ShadowFragment;
+import com.textonphoto.photoeditor.quotecreator.edit_text.SpacingFragment;
+import com.textonphoto.photoeditor.quotecreator.edit_text.TextSizeFragment;
 import com.textonphoto.photoeditor.quotecreator.emoji.EmojiFragment;
 import com.textonphoto.photoeditor.quotecreator.filter.FilterFragment;
-import com.textonphoto.photoeditor.quotecreator.fonts.AddTextAdapter;
-import com.textonphoto.photoeditor.quotecreator.fonts.AddTextFragment;
-import com.textonphoto.photoeditor.quotecreator.fonts.FontsFragment;
+import com.textonphoto.photoeditor.quotecreator.edit_text.FontsFragment;
 import com.textonphoto.photoeditor.quotecreator.image.ImageFragment;
 import com.textonphoto.photoeditor.quotecreator.stickers.StickersFragment;
+import com.textonphoto.photoeditor.quotecreator.utils.BitmapUtils;
+import com.textonphoto.photoeditor.quotecreator.views.OnPhotoEditorListener;
+import com.textonphoto.photoeditor.quotecreator.views.PhotoEditor;
 import com.textonphoto.photoeditor.quotecreator.views.PhotoEditorView;
+import com.textonphoto.photoeditor.quotecreator.views.SaveSettings;
+import com.textonphoto.photoeditor.quotecreator.views.ViewType;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements EditingToolsAdapter.OnItemSelected, EditingToolssAdapter.OnItemSelected, AddTextAdapter.EditViewListener {
+public class MainActivity extends BaseActivity implements OnPhotoEditorListener, ImageFragment.OnImageListener {
 
-    private boolean isUpBackgroud = true;
-    private boolean isUpBrush = true;
-    private boolean isUpText = true;
-    private boolean isUpFilter = true;
-    private boolean isUpEmoij = true;
-    private boolean isUpSticker = true;
-    private boolean isUpEraser = true;
+    private static final int CAMERA_REQUEST = 52;
+    private static final int PICK_REQUEST = 53;
 
-    //    private View viewTextBottom;
     private ImageView addText;
-    private PhotoEditorView drawView;
-
-    private RecyclerView lineRow;
-
-    private View viewBottom;
-    private View viewBottomAddText;
-
-    private EditingToolsAdapter mEditingToolsAdapter = new EditingToolsAdapter(this);
-
-    private ToolType currentToolType = ToolType.BACKGROUND;
-    //Setup add text fragment
-    FragmentManager fragmentManager;
-    FragmentTransaction fragmentTransaction;
+    private PhotoEditor mPhotoEditor;
+    private PhotoEditorView mPhotoEditorView;
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
+    private View containerTextTabs;
+    private TabLayout textTabLayout;
+    private ViewPager textViewPager;
+
+    private View back;
+
     private View llSave;
     private View viewHome;
+
+    private ConstraintLayout mRootView;
 
     private void setupTabIcons() {
 
@@ -69,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
                 R.drawable.ic_camera_2,
                 R.drawable.ic_gallery,
                 R.drawable.ic_brush,
-                R.drawable.ic_text,
                 R.drawable.ic_photo_filter,
                 R.drawable.ic_insert_emoticon,
                 R.drawable.ic_sticker,
@@ -81,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
         tabLayout.getTabAt(3).setIcon(tabIcons[3]);
         tabLayout.getTabAt(4).setIcon(tabIcons[4]);
         tabLayout.getTabAt(5).setIcon(tabIcons[5]);
-        tabLayout.getTabAt(6).setIcon(tabIcons[6]);
 
 //        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
 //        tabOne.setText("ONE");
@@ -91,22 +107,71 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
 
 
     private void setupViewPager(ViewPager viewPager) {
+        ImageFragment imageFragment = new ImageFragment();
+        imageFragment.setImageListener(this);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new ImageFragment(), "Canvas");
+        adapter.addFragment(imageFragment, "Canvas");
         adapter.addFragment(new BackgroundFragment(), "Background");
         adapter.addFragment(new BrushFragment(), "Brush");
-        adapter.addFragment(new FontsFragment(), "Text");
         adapter.addFragment(new FilterFragment(), "Filter");
         adapter.addFragment(new EmojiFragment(), "Emoji");
         adapter.addFragment(new StickersFragment(), "Sticker");
         viewPager.setAdapter(adapter);
     }
 
+    private void setupTextTabIcons() {
+
+        int[] tabIcons = {
+                R.drawable.ic_camera_2,
+                R.drawable.ic_gallery,
+                R.drawable.ic_brush,
+                R.drawable.ic_text,
+                R.drawable.ic_photo_filter,
+                R.drawable.ic_insert_emoticon,
+                R.drawable.ic_sticker,
+        };
+
+        textTabLayout.getTabAt(0).setIcon(tabIcons[0]);
+        textTabLayout.getTabAt(1).setIcon(tabIcons[1]);
+        textTabLayout.getTabAt(2).setIcon(tabIcons[2]);
+        textTabLayout.getTabAt(3).setIcon(tabIcons[3]);
+        textTabLayout.getTabAt(4).setIcon(tabIcons[4]);
+        textTabLayout.getTabAt(5).setIcon(tabIcons[5]);
+        textTabLayout.getTabAt(6).setIcon(tabIcons[6]);
+        textTabLayout.getTabAt(7).setIcon(tabIcons[6]);
+
+//        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+//        tabOne.setText("ONE");
+//        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_tab_favourite, 0, 0);
+//        tabLayout.getTabAt(0).setCustomView(tabOne);
+    }
+
+
+    private void setupTextViewPager(ViewPager viewPager) {
+        ImageFragment imageFragment = new ImageFragment();
+        imageFragment.setImageListener(this);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new FormatFragment(), "FORMAT");
+        adapter.addFragment(new FontsFragment(), "FONT");
+        adapter.addFragment(new TextSizeFragment(), "TEXT SIZE");
+        adapter.addFragment(new ColorFragment(), "COLOR");
+        adapter.addFragment(new ShadowFragment(), "SHADOW");
+        adapter.addFragment(new SpacingFragment(), "SPACING");
+        adapter.addFragment(new BlurFragment(), "BLUR");
+        adapter.addFragment(new HighLightFragment(), "HIGHLIGHT");
+
+
+        viewPager.setAdapter(adapter);
+    }
+
+    private static Typeface mTypeface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_temp);
+
+        initViews();
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
@@ -116,11 +181,22 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
 
+        back = findViewById(R.id.back);
+        containerTextTabs = findViewById(R.id.containerTextTabs);
+
+        textViewPager = (ViewPager) findViewById(R.id.textViewpager);
+        setupTextViewPager(textViewPager);
+
+        textTabLayout = (TabLayout) findViewById(R.id.textTabs);
+        textTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        textTabLayout.setupWithViewPager(textViewPager);
+        setupTextTabIcons();
+
         llSave = findViewById(R.id.llSave);
         llSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                saveImage();
             }
         });
 
@@ -128,196 +204,65 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
         viewHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-            }
-        });
-
-        fragmentManager = getSupportFragmentManager();
-
-        addText = findViewById(R.id.addText);
-        addText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, MainActivity.class));
                 finish();
             }
         });
-
-        viewBottom = findViewById(R.id.frContainer);
-        viewBottomAddText = findViewById(R.id.frContainerAddText);
-
-        drawView = findViewById(R.id.drawView);
-
-        drawView.setOnClickListener(new View.OnClickListener() {
+        mTypeface = Typeface.createFromAsset(getAssets(),
+                Contants.folderFontPath + "AbrilFatface-Regular.ttf");
+        addText = findViewById(R.id.addText);
+        addText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switch (currentToolType) {
-                    case BACKGROUND:
-                        if (isUpText) {
-                            slideDown(lineRow);
-                            viewBottom.setVisibility(View.VISIBLE);
-                            slideUp(viewBottom);
-                            isUpText = false;
-                        } else {
-                            slideDown(viewBottom);
-                            viewBottom.setVisibility(GONE);
-                            slideUp(lineRow);
-                            isUpText = true;
-                        }
-                        break;
-                    case BRUSH:
-                        if (isUpText) {
-                            slideDown(lineRow);
-                            viewBottom.setVisibility(View.VISIBLE);
-                            slideUp(viewBottom);
-                            isUpText = false;
-                        } else {
-                            slideDown(viewBottom);
-                            viewBottom.setVisibility(GONE);
-                            slideUp(lineRow);
-                            isUpText = true;
-                        }
-                        break;
-                    case TEXT:
-                        if (isUpText) {
-                            slideDown(lineRow);
-                            viewBottomAddText.setVisibility(View.VISIBLE);
-                            slideUp(viewBottomAddText);
-                            isUpText = false;
-                        } else {
-                            slideDown(viewBottomAddText);
-                            viewBottomAddText.setVisibility(GONE);
-                            slideUp(lineRow);
-                            isUpText = true;
-                        }
-                        break;
-                    case FILTER:
-                        if (isUpText) {
-                            slideDown(lineRow);
-                            viewBottom.setVisibility(View.VISIBLE);
-                            slideUp(viewBottom);
-                            isUpText = false;
-                        } else {
-                            slideDown(viewBottom);
-                            viewBottom.setVisibility(GONE);
-                            slideUp(lineRow);
-                            isUpText = true;
-                        }
-                        break;
-                    case EMOJI:
-                        if (isUpText) {
-                            slideDown(lineRow);
-                            viewBottom.setVisibility(View.VISIBLE);
-                            slideUp(viewBottom);
-                            isUpText = false;
-                        } else {
-                            slideDown(viewBottom);
-                            viewBottom.setVisibility(GONE);
-                            slideUp(lineRow);
-                            isUpText = true;
-                        }
-                        break;
-                    case STICKER:
-                        if (isUpText) {
-                            slideDown(lineRow);
-                            viewBottom.setVisibility(View.VISIBLE);
-                            slideUp(viewBottom);
-                            isUpText = false;
-                        } else {
-                            slideDown(viewBottom);
-                            viewBottom.setVisibility(GONE);
-                            slideUp(lineRow);
-                            isUpText = true;
-                        }
-                        break;
-                    case ERASER:
-                        if (isUpText) {
-                            slideDown(lineRow);
-                            viewBottom.setVisibility(View.VISIBLE);
-                            slideUp(viewBottom);
-                            isUpText = false;
-                        } else {
-                            slideDown(viewBottom);
-                            viewBottom.setVisibility(GONE);
-                            slideUp(lineRow);
-                            isUpText = true;
-                        }
-                        break;
-
-                }
+//                startActivity(new Intent(MainActivity.this, MainActivity.class));
+//                finish();
+                mPhotoEditor.addText(mTypeface, "Tap to input text", getResources().getColor(R.color.red_color_picker), 30);
             }
         });
 
-        setLineToolBottom();
-        setBackgroundFragment();
-        setFontsFragment();
+        mPhotoEditor = new PhotoEditor.Builder(this, mPhotoEditorView)
+                .setPinchTextScalable(true) // set flag to make text scalable when pinch
+                //.setDefaultTextTypeface(mTextRobotoTf)
+                //.setDefaultEmojiTypeface(mEmojiTypeFace)
+                .build(); // build photo editor sdk
+
+        mPhotoEditor.setOnPhotoEditorListener(this);
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                containerTextTabs.setVisibility(View.INVISIBLE);
+                containerTextTabs.setVisibility(View.INVISIBLE);
+                tabLayout.setVisibility(View.VISIBLE);
+                viewPager.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //loadType();
     }
 
-    private void setLineToolBottom() {
-        lineRow = findViewById(R.id.lineTools);
-        LinearLayoutManager llmTools = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        lineRow.setLayoutManager(llmTools);
-        lineRow.setAdapter(mEditingToolsAdapter);
-
+    private void initViews() {
+        mRootView = findViewById(R.id.rootView);
+        mPhotoEditorView = findViewById(R.id.photoEditorView);
     }
 
-    private void setAddTextFragment() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        AddTextFragment addTextFragment = AddTextFragment.newInstance();
-        fragmentTransaction.replace(R.id.frContainer, addTextFragment);
-        fragmentTransaction.commit();
-    }
+    private String key = "1";
 
-    FontsFragment fontsFragment;
-
-    private void setFontsFragment() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        fontsFragment = FontsFragment.newInstance();
-        fragmentTransaction.replace(R.id.frContainerAddText, fontsFragment);
-        fragmentTransaction.commit();
-//        fontsFragment.setOnFontListener(new FontsFragment.OnFontListener() {
-//            @Override
-//            public void onFontChoose(Typeface typeface) {
-//                if (viewBottom.getVisibility() == VISIBLE) {
-//                    Toast.makeText(MainActivity.this, "Type", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-    }
-
-    private void setBackgroundFragment() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        BackgroundFragment backgroundFragment = BackgroundFragment.newInstance();
-        fragmentTransaction.replace(R.id.frContainer, backgroundFragment);
-        fragmentTransaction.commit();
-    }
-
-    private void setBrushFragment() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        BrushFragment brushFragment = BrushFragment.newInstance();
-        fragmentTransaction.replace(R.id.frContainer, brushFragment);
-        fragmentTransaction.commit();
-    }
-
-    private void setEmojiFragment() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        EmojiFragment emojiFragment = EmojiFragment.newInstance();
-        fragmentTransaction.replace(R.id.frContainer, emojiFragment);
-        fragmentTransaction.commit();
-    }
-
-    private void setStickersFragment() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        StickersFragment stickersFragment = StickersFragment.newInstance();
-        fragmentTransaction.replace(R.id.frContainer, stickersFragment);
-        fragmentTransaction.commit();
-    }
-
-    private void setFilterFragment() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        FilterFragment filterFragment = FilterFragment.newInstance();
-        fragmentTransaction.replace(R.id.frContainer, filterFragment);
-        fragmentTransaction.commit();
+    private void loadType() {
+        switch (key) {
+            case "1":
+                Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.got_s);
+                Bitmap imageScale = Bitmap.createScaledBitmap(image, 300, 300, false);
+                mPhotoEditor.addImage(imageScale);
+                break;
+            case "2":
+                mPhotoEditorView.getSource().setImageResource(R.drawable.got);
+                break;
+            case "3":
+                break;
+            default:
+                break;
+        }
     }
 
     // slide the view from below itself to the current position
@@ -335,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
 
     // slide the view from its current position to below itself
     public void slideDown(View view) {
-        view.setVisibility(GONE);
+        view.setVisibility(View.GONE);
         TranslateAnimation animate = new TranslateAnimation(
                 0,                 // fromXDelta
                 0,                 // toXDelta
@@ -346,202 +291,319 @@ public class MainActivity extends AppCompatActivity implements EditingToolsAdapt
         view.startAnimation(animate);
     }
 
-    // slide the view from its current position to below itself
-    public void slideDown(View view, boolean check) {
-        if (check) {
-            view.setVisibility(GONE);
-            TranslateAnimation animate = new TranslateAnimation(
-                    0,                 // fromXDelta
-                    0,                 // toXDelta
-                    0,                 // fromYDelta
-                    view.getHeight()); // toYDelta
-            animate.setDuration(500);
-            animate.setFillAfter(true);
-            view.startAnimation(animate);
-        } else {
-//            view.setVisibility(GONE);
-            TranslateAnimation animate = new TranslateAnimation(
-                    0,                 // fromXDelta
-                    0,                 // toXDelta
-                    0,                 // fromYDelta
-                    view.getHeight()); // toYDelta
-            animate.setDuration(500);
-            animate.setFillAfter(true);
-            view.startAnimation(animate);
-        }
+    @Override
+    public void onImageChangeListener(View rootView, Bitmap bitmap) {
+
     }
 
     @Override
-    public void onToolSelected(ToolType toolType) {
-        currentToolType = toolType;
-        switch (toolType) {
-            case BACKGROUND:
-//                setBackgroundFragment();
-                if (isUpText) {
-                    slideDown(lineRow);
-                    slideUp(viewBottom);
-                    isUpText = false;
-                } else {
-                    slideDown(viewBottom);
-                    slideUp(lineRow);
-                    isUpText = true;
-                    viewBottom.clearFocus();
-                }
-                break;
-            case TEXT:
-//                setFontsFragment();
-                isUpText = true;
-                if (isUpText) {
-                    slideDown(lineRow);
-                    slideUp(viewBottomAddText);
-                    isUpText = false;
-                } else {
-                    slideDown(viewBottomAddText);
-                    slideUp(lineRow);
-                    isUpText = true;
-                    if (getSupportFragmentManager().findFragmentById(R.id.frContainerAddText) != null) {
-                        getSupportFragmentManager()
-                                .beginTransaction().
-                                remove(getSupportFragmentManager().findFragmentById(R.id.frContainerAddText)).commit();
+    public void onEditTextChangeListener(View rootView, String text, int colorCode) {
+        Log.d("TAGG", "text");
+//        mPhotoEditor.editText(rootView, mTypeface, "Change", R.color.red_color_picker, 50);
+        containerTextTabs.setVisibility(View.VISIBLE);
+        textViewPager.setVisibility(View.VISIBLE);
+        tabLayout.setVisibility(View.INVISIBLE);
+        viewPager.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onEditTextChangeListener(View rootView, String text, int colorCode, Typeface typeFace, int textSize) {
+        Log.d("TAGG", "text");
+//        mPhotoEditor.editText(rootView, mTypeface, "Change", R.color.red_color_picker, 50);
+        containerTextTabs.setVisibility(View.VISIBLE);
+        textViewPager.setVisibility(View.VISIBLE);
+        tabLayout.setVisibility(View.INVISIBLE);
+        viewPager.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onAddViewListener(ViewType viewType, int numberOfAddedViews) {
+
+    }
+
+    @Override
+    public void onRemoveViewListener(int numberOfAddedViews) {
+
+    }
+
+    @Override
+    public void onRemoveViewListener(ViewType viewType, int numberOfAddedViews) {
+
+    }
+
+    @Override
+    public void onStartViewChangeListener(ViewType viewType) {
+
+    }
+
+    @Override
+    public void onStopViewChangeListener(ViewType viewType) {
+
+    }
+
+    @SuppressLint("MissingPermission")
+    private void saveImage() {
+        if (requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            showLoading("Saving...");
+            String fullPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/addTextapp";
+
+//            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/photoEditor"
+//                    + System.currentTimeMillis() + ".png");
+
+            File file = new File(Environment.getExternalStorageDirectory()
+                    + File.separator + ""
+                    + System.currentTimeMillis() + ".png");
+            Log.d("TABBBB", file.getAbsolutePath());
+            try {
+                file.createNewFile();
+
+                SaveSettings saveSettings = new SaveSettings.Builder()
+                        .setClearViewsEnabled(true)
+                        .setTransparencyEnabled(true)
+                        .build();
+
+                mPhotoEditor.saveAsFile(file.getAbsolutePath(), saveSettings, new PhotoEditor.OnSaveListener() {
+                    @Override
+                    public void onSuccess(@NonNull final String imagePath) {
+                        hideLoading();
+//                        showSnackbar("Image Saved Successfully");
+                        Log.d("TABBBB", imagePath);
+                        mPhotoEditorView.getSource().setImageURI(Uri.fromFile(new File(imagePath)));
+                        mPhotoEditorView.getSource().buildDrawingCache();
+                        Bitmap bmap = mPhotoEditorView.getSource().getDrawingCache();
+                        saveImageToGallery(bmap);
+
+//                        if (!TextUtils.isEmpty(imagePath)) {
+//                            Snackbar snackbar = Snackbar
+//                                    .make(mRootView, "Image saved to gallery!", Snackbar.LENGTH_LONG)
+//                                    .setAction("OPEN", new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View view) {
+//                                            openImage(imagePath);
+//                                        }
+//                                    });
+//
+//                            snackbar.show();
+//                        } else {
+//                            Snackbar snackbar = Snackbar
+//                                    .make(mRootView, "Unable to save image!", Snackbar.LENGTH_LONG);
+//
+//                            snackbar.show();
+//                        }
                     }
-                    viewBottomAddText.clearFocus();
-                }
-                break;
-            case BRUSH:
-                setBrushFragment();
-                isUpText = true;
-                if (isUpText) {
-                    slideDown(lineRow);
-                    slideUp(viewBottom);
-                    isUpText = false;
-                } else {
-                    slideDown(viewBottom);
-                    slideUp(lineRow);
-                    isUpText = true;
-                    viewBottom.clearFocus();
-                }
 
-                break;
-            case EMOJI:
-                setEmojiFragment();
-                isUpText = true;
-                if (isUpText) {
-                    slideDown(lineRow);
-                    slideUp(viewBottom);
-                    isUpText = false;
-                } else {
-                    slideDown(viewBottom);
-                    slideUp(lineRow);
-                    isUpText = true;
-                }
-
-                break;
-            case ERASER:
-                isUpText = true;
-                if (isUpText) {
-                    slideDown(lineRow);
-                    slideUp(viewBottom);
-                    isUpText = false;
-                } else {
-                    slideDown(viewBottom);
-                    slideUp(lineRow);
-                    isUpText = true;
-                }
-
-                break;
-            case FILTER:
-                setFilterFragment();
-                isUpText = true;
-                if (isUpText) {
-                    slideDown(lineRow);
-                    viewBottom.setVisibility(View.VISIBLE);
-                    slideUp(viewBottom);
-                    isUpText = false;
-                } else {
-                    slideDown(viewBottom);
-                    viewBottom.setVisibility(GONE);
-                    slideUp(lineRow);
-                    isUpText = true;
-                }
-
-                break;
-            case STICKER:
-                setStickersFragment();
-                isUpText = true;
-                if (isUpText) {
-                    slideDown(lineRow);
-                    viewBottom.setVisibility(View.VISIBLE);
-                    slideUp(viewBottom);
-                    isUpText = false;
-                } else {
-                    slideDown(viewBottom);
-                    viewBottom.setVisibility(GONE);
-                    slideUp(lineRow);
-                    isUpText = true;
-                }
-
-                break;
-
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        hideLoading();
+                        showSnackbar("Failed to save Image");
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+                hideLoading();
+                showSnackbar(e.getMessage());
+            }
         }
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if (isUp) {
-//            slideDown(lineRow);
-//            viewBottom.setVisibility(View.VISIBLE);
-//            slideUp(viewBottom);
-//            isUp = false;
-//        } else {
-//            slideDown(viewBottom);
-//            viewBottom.setVisibility(GONE);
-//            slideUp(lineRow);
-//            isUp = true;
+//    @SuppressLint("MissingPermission")
+//    private void saveImage() {
+//        if (requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//            showLoading("Saving...");
+//            File file = new File(Environment.getExternalStorageDirectory()
+//                    + File.separator + ""
+//                    + System.currentTimeMillis() + ".png");
+//            try {
+//                file.createNewFile();
+//
+//                SaveSettings saveSettings = new SaveSettings.Builder()
+//                        .setClearViewsEnabled(true)
+//                        .setTransparencyEnabled(true)
+//                        .build();
+//
+//                mPhotoEditor.saveAsFile(file.getAbsolutePath(), saveSettings, new PhotoEditor.OnSaveListener() {
+//                    @Override
+//                    public void onSuccess(@NonNull final String imagePath) {
+//                        hideLoading();
+//                        //addImageToGallery(imagePath);
+////                        showSnackbar("Image Saved Successfully");
+//                        mPhotoEditorView.getSource().setImageURI(Uri.fromFile(new File(imagePath)));
+//                        if (!TextUtils.isEmpty(imagePath)) {
+//                            Snackbar snackbar = Snackbar
+//                                    .make(mRootView, "Image saved to gallery!", Snackbar.LENGTH_LONG)
+//                                    .setAction("OPEN", new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View view) {
+//                                            openImage(imagePath);
+//                                        }
+//                                    });
+//
+//                            snackbar.show();
+//                        } else {
+//                            Snackbar snackbar = Snackbar
+//                                    .make(mRootView, "Unable to save image!", Snackbar.LENGTH_LONG);
+//
+//                            snackbar.show();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(@NonNull Exception exception) {
+//                        hideLoading();
+//                        showSnackbar("Failed to save Image");
+//                    }
+//                });
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                hideLoading();
+//                showSnackbar(e.getMessage());
+//            }
 //        }
 //    }
 
+    /*
+   * saves image to camera gallery
+   * */
+    private void saveImageToGallery(final Bitmap finalImage) {
+        Dexter.withActivity(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            final String path = BitmapUtils.insertImage(getContentResolver(), finalImage, System.currentTimeMillis() + "_profile.jpg", null);
+                            if (!TextUtils.isEmpty(path)) {
+                                Snackbar snackbar = Snackbar
+                                        .make(mRootView, "Image saved to gallery!", Snackbar.LENGTH_LONG)
+                                        .setAction("OPEN", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                openImage(path);
+                                            }
+                                        });
+
+                                snackbar.show();
+                            } else {
+                                Snackbar snackbar = Snackbar
+                                        .make(mRootView, "Unable to save image!", Snackbar.LENGTH_LONG);
+
+                                snackbar.show();
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Permissions are not granted!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
+
+    }
+
+    public void addImageToGallery(final String filePath) {
+
+        ContentValues values = new ContentValues();
+
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.MediaColumns.DATA, filePath);
+
+        getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    }
+
+    // opening image in default image viewer app
+    private void openImage(String path) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse(path), "image/*");
+        startActivity(intent);
+    }
+
     @Override
-    public void onFormatListener() {
+    public void isPermissionGranted(boolean isGranted, String permission) {
+        if (isGranted) {
+            saveImage();
+        }
+    }
+
+    private void showSaveDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you want to exit without saving image ?");
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveImage();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNeutralButton("Discard", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        builder.create().show();
+
+    }
+
+    /**
+     * Image fragment listener
+     **/
+    @Override
+    public void onImageBackgroundChoose() {
 
     }
 
     @Override
-    public void onFontListener() {
-
+    public void onImageCameraChoose() {
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, CAMERA_REQUEST);
     }
 
     @Override
-    public void onTextSizeListener() {
-
+    public void onImageGalleryChoose() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_REQUEST);
     }
 
     @Override
-    public void onColorListener() {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case CAMERA_REQUEST:
+                    mPhotoEditor.clearAllViews();
+                    Bitmap photo = (Bitmap) data.getExtras().get("data");
+                    if (key.equals("1")) {
+                        mPhotoEditorView.getSource().setImageBitmap(photo);
+                    } else {
+                        mPhotoEditor.addImage(photo);
+                    }
 
-    }
-
-    @Override
-    public void onShadowListener() {
-
-    }
-
-    @Override
-    public void onStrokeListener() {
-
-    }
-
-    @Override
-    public void onHighLightListener() {
-
-    }
-
-    @Override
-    public void onSpacingListener() {
-
-    }
-
-    @Override
-    public void onBlurListener() {
-
+                    break;
+                case PICK_REQUEST:
+                    try {
+                        mPhotoEditor.clearAllViews();
+                        Uri uri = data.getData();
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                        if (key.equals("1")) {
+                            mPhotoEditorView.getSource().setImageBitmap(bitmap);
+                        } else {
+                            mPhotoEditor.addImage(bitmap);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
     }
 }

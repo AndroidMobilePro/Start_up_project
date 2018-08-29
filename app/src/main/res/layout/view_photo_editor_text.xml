@@ -16,10 +16,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:textColor="#000000"
+            android:textColor="@color/red_color_picker"
             android:textSize="18sp"
             tools:text="Burhanuddin"
-            tools:textColor="@android:color/black" />
+            tools:textColor="@android:color/holo_red_light" />
 
     </FrameLayout>
 

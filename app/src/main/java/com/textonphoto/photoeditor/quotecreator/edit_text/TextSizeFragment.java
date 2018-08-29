@@ -1,4 +1,4 @@
-package com.textonphoto.photoeditor.quotecreator.background;
+package com.textonphoto.photoeditor.quotecreator.edit_text;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,20 +12,18 @@ import android.widget.Toast;
 
 import com.textonphoto.photoeditor.quotecreator.R;
 
-public class BackgroundFragment extends Fragment {
+public class TextSizeFragment extends Fragment {
 
-    private RecyclerView backgroundRecyclerView;
-    private BackgroudAdapter backgroudAdapter;
     private ImageView showMore;
 
     private OnBackgroundListener onBackgroundListener;
 
-    public BackgroundFragment() {
+    public TextSizeFragment() {
         // Required empty public constructor
     }
 
-    public static BackgroundFragment newInstance() {
-        BackgroundFragment fragment = new BackgroundFragment();
+    public static TextSizeFragment newInstance() {
+        TextSizeFragment fragment = new TextSizeFragment();
         return fragment;
     }
 
@@ -42,15 +40,7 @@ public class BackgroundFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_background, container, false);
-        backgroudAdapter = new BackgroudAdapter(getActivity());
-
-        backgroundRecyclerView = view.findViewById(R.id.background_recycler_view);
-        LinearLayoutManager layoutEditManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        backgroundRecyclerView.setLayoutManager(layoutEditManager);
-        backgroundRecyclerView.setHasFixedSize(true);
-        //This listener will change the text fonts when clicked on any fonts
-        backgroundRecyclerView.setAdapter(backgroudAdapter);
+        View view = inflater.inflate(R.layout.fragment_edit_text_text_size, container, false);
 
         showMore = view.findViewById(R.id.showMore);
         showMore.setOnClickListener(new View.OnClickListener() {

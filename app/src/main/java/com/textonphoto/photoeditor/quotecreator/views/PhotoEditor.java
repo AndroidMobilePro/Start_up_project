@@ -135,6 +135,61 @@ public class PhotoEditor implements BrushViewChangeListener {
      * This add the text on the {@link PhotoEditorView} with provided parameters
      * by default {@link TextView#setText(int)} will be 18sp
      *
+     * @param text              text to display
+     * @param colorCodeTextView text color to be displayed
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    public void addText(String text, final int colorCodeTextView, final int textSize) {
+        brushDrawingView.setBrushDrawingMode(false);
+        final View textRootView = getLayout(ViewType.TEXT);
+        final TextView textInputTv = textRootView.findViewById(R.id.tvPhotoEditorText);
+        final ImageView imgClose = textRootView.findViewById(R.id.imgPhotoEditorClose);
+        final FrameLayout frmBorder = textRootView.findViewById(R.id.frmBorder);
+
+        textInputTv.setText(text);
+        textInputTv.setTextColor(colorCodeTextView);
+        textInputTv.setTextSize(textSize);
+        currentSize = textSize;
+        MultiTouchListener multiTouchListener = getMultiTouchListener();
+        multiTouchListener.setOnGestureControl(new MultiTouchListener.OnGestureControl() {
+            @Override
+            public void onClick() {
+//                boolean isBackgroundVisible = frmBorder.getTag() != null && (boolean) frmBorder.getTag();
+//                frmBorder.setBackgroundResource(isBackgroundVisible ? 0 : R.drawable.rounded_border_tv);
+//                imgClose.setVisibility(isBackgroundVisible ? View.GONE : View.VISIBLE);
+//                frmBorder.setTag(!isBackgroundVisible);
+
+                String textInput = textInputTv.getText().toString();
+                int currentTextColor = textInputTv.getCurrentTextColor();
+                int currentTextSize = currentSize;
+                Log.d("TAJJJ", currentTextSize + "");
+                Typeface currentTypeFace = textInputTv.getTypeface();
+                if (mOnPhotoEditorListener != null) {
+                    mOnPhotoEditorListener.onEditTextChangeListener(textRootView, textInput, currentTextColor);
+                }
+            }
+
+            @Override
+            public void onLongClick() {
+                String textInput = textInputTv.getText().toString();
+                int currentTextColor = textInputTv.getCurrentTextColor();
+                int currentTextSize = currentSize;
+                Log.d("TAJJJ", currentTextSize + "");
+                Typeface currentTypeFace = textInputTv.getTypeface();
+                if (mOnPhotoEditorListener != null) {
+                    mOnPhotoEditorListener.onEditTextChangeListener(textRootView, textInput, currentTextColor);
+                }
+            }
+        });
+
+        textRootView.setOnTouchListener(multiTouchListener);
+        addViewToParent(textRootView, ViewType.TEXT);
+    }
+
+    /**
+     * This add the text on the {@link PhotoEditorView} with provided parameters
+     * by default {@link TextView#setText(int)} will be 18sp
+     *
      * @param textTypeface      typeface for custom font in the text
      * @param text              text to display
      * @param colorCodeTextView text color to be displayed
@@ -158,10 +213,22 @@ public class PhotoEditor implements BrushViewChangeListener {
         multiTouchListener.setOnGestureControl(new MultiTouchListener.OnGestureControl() {
             @Override
             public void onClick() {
-                boolean isBackgroundVisible = frmBorder.getTag() != null && (boolean) frmBorder.getTag();
+                boolean isBackgroundVisible = false;
                 frmBorder.setBackgroundResource(isBackgroundVisible ? 0 : R.drawable.rounded_border_tv);
                 imgClose.setVisibility(isBackgroundVisible ? View.GONE : View.VISIBLE);
                 frmBorder.setTag(!isBackgroundVisible);
+
+
+                String textInput = textInputTv.getText().toString();
+                int currentTextColor = textInputTv.getCurrentTextColor();
+                int currentTextSize = currentSize;
+                Log.d("TAJJJ", currentTextSize + "");
+                Typeface currentTypeFace = textInputTv.getTypeface();
+                if (mOnPhotoEditorListener != null) {
+//                    mOnPhotoEditorListener.onEditTextChangeListener(textRootView, textInput, currentTextColor);
+                    mOnPhotoEditorListener.onEditTextChangeListener(textRootView, textInput, currentTextColor, currentTypeFace, currentTextSize);
+                }
+
             }
 
             @Override
@@ -177,8 +244,24 @@ public class PhotoEditor implements BrushViewChangeListener {
                 }
             }
         });
-
+////
+////        MultiTouchListener multiTouchRootListener = getMultiTouchListener();
+////        multiTouchRootListener.setOnGestureControl(new MultiTouchListener.OnGestureControl() {
+////            @Override
+////            public void onClick() {
+////                boolean isBackgroundVisible = frmBorder.getTag() != null && (boolean) frmBorder.getTag();
+////                frmBorder.setBackgroundResource(0);
+////                imgClose.setVisibility(View.GONE);
+////                frmBorder.setTag(!isBackgroundVisible);
+////            }
+////
+////            @Override
+////            public void onLongClick() {
+////            }
+////        });
+//
         textRootView.setOnTouchListener(multiTouchListener);
+//        parentView.setOnTouchListener(multiTouchRootListener);
         addViewToParent(textRootView, ViewType.TEXT);
     }
 

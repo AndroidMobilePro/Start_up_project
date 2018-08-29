@@ -8,7 +8,7 @@
 
     <!-- TODO: Update blank fragment layout -->
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/emoji_recycler_view"
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -16,12 +16,13 @@
         tools:background="@android:color/white"
         tools:listitem="@layout/row_editing_tools" />
 
+
     <ImageView
         android:id="@+id/showMore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center_vertical"
         android:layout_marginRight="10dp"
-        android:src="@drawable/ic_effect" />
-
+        android:padding="5dp"
+        android:src="@drawable/ic_paint" />
 </FrameLayout>

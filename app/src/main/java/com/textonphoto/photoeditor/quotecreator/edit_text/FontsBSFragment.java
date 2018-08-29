@@ -1,18 +1,20 @@
-package com.textonphoto.photoeditor.quotecreator.fonts;
+package com.textonphoto.photoeditor.quotecreator.edit_text;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.textonphoto.photoeditor.quotecreator.R;
-import com.textonphoto.photoeditor.quotecreator.edit_text.FontsAdapter;
+import com.textonphoto.photoeditor.quotecreator.constants.Contants;
 
 public class FontsBSFragment extends BottomSheetDialogFragment {
 
@@ -53,6 +55,13 @@ public class FontsBSFragment extends BottomSheetDialogFragment {
         super.setupDialog(dialog, style);
         View contentView = View.inflate(getContext(), R.layout.fragment_bottom_fonts_dialog, null);
         dialog.setContentView(contentView);
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) ((View) contentView.getParent()).getLayoutParams();
+        CoordinatorLayout.Behavior behavior = params.getBehavior();
+
+        if (behavior != null && behavior instanceof BottomSheetBehavior) {
+            ((BottomSheetBehavior) behavior).setBottomSheetCallback(mBottomSheetBehaviorCallback);
+        }
+        ((View) contentView.getParent()).setBackgroundColor(getResources().getColor(android.R.color.transparent));
 
         RecyclerView rvEmoji = contentView.findViewById(R.id.rvEmoji);
 
@@ -63,6 +72,9 @@ public class FontsBSFragment extends BottomSheetDialogFragment {
         fontsAdapter.setFontsPickerListener(new FontsAdapter.OnTextPickerClickListener() {
             @Override
             public void onTextPickerClickListener(String fonts) {
+                Typeface typeface = Typeface.createFromAsset(getActivity().getAssets(),
+                        Contants.folderFontPath + fonts);
+                mFontsListener.onFontClick(fonts);
             }
         });
         rvEmoji.setAdapter(fontsAdapter);
