@@ -16,9 +16,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             android:textColor="@color/red_color_picker"
             android:textSize="18sp"
-            tools:text="Burhanuddin"
+            tools:text="Input"
             tools:textColor="@android:color/holo_red_light" />
 
     </FrameLayout>
@@ -29,6 +31,6 @@
         android:layout_height="15dp"
         android:layout_gravity="top|start"
         android:elevation="1dp"
-        android:src="@drawable/ic_remove" />
+        android:src="@drawable/ic_cancel" />
 
 </FrameLayout>

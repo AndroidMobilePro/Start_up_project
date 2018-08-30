@@ -9,13 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.textonphoto.photoeditor.quotecreator.R;
+import com.textonphoto.photoeditor.quotecreator.views.PhotoFilter;
 
-public class FilterFragment extends Fragment {
+public class FilterFragment extends Fragment implements FilterListener {
 
     private OnFilterListener onFilterListener;
 
     private RecyclerView filterRecyclerView;
-    private FilterAdapter filterAdapter;
+    private FilterViewAdapter filterAdapter;
     public FilterFragment() {
         // Required empty public constructor
     }
@@ -39,7 +40,7 @@ public class FilterFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_filter, container, false);
-        filterAdapter = new FilterAdapter(getActivity());
+        filterAdapter = new FilterViewAdapter(getActivity(), this);
         filterRecyclerView = view.findViewById(R.id.filter_recycler_view);
         LinearLayoutManager layoutEditManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         filterRecyclerView.setLayoutManager(layoutEditManager);
@@ -49,8 +50,15 @@ public class FilterFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onFilterSelected(PhotoFilter photoFilter) {
+        if (onFilterListener != null) {
+            onFilterListener.onFilterChoose(photoFilter);
+        }
+    }
 
-    static public interface OnFilterListener {
-        void onFilterChoose();
+
+    public interface OnFilterListener {
+        void onFilterChoose(PhotoFilter photoFilter);
     }
 }

@@ -20,10 +20,12 @@ import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.karumi.dexter.Dexter;
@@ -35,6 +37,7 @@ import com.textonphoto.photoeditor.quotecreator.background.BackgroundFragment;
 import com.textonphoto.photoeditor.quotecreator.base.BaseActivity;
 import com.textonphoto.photoeditor.quotecreator.brush.BrushFragment;
 import com.textonphoto.photoeditor.quotecreator.constants.Contants;
+import com.textonphoto.photoeditor.quotecreator.decorate.DecorateFragment;
 import com.textonphoto.photoeditor.quotecreator.edit_text.BlurFragment;
 import com.textonphoto.photoeditor.quotecreator.edit_text.ColorFragment;
 import com.textonphoto.photoeditor.quotecreator.edit_text.FormatFragment;
@@ -51,6 +54,7 @@ import com.textonphoto.photoeditor.quotecreator.utils.BitmapUtils;
 import com.textonphoto.photoeditor.quotecreator.views.OnPhotoEditorListener;
 import com.textonphoto.photoeditor.quotecreator.views.PhotoEditor;
 import com.textonphoto.photoeditor.quotecreator.views.PhotoEditorView;
+import com.textonphoto.photoeditor.quotecreator.views.PhotoFilter;
 import com.textonphoto.photoeditor.quotecreator.views.SaveSettings;
 import com.textonphoto.photoeditor.quotecreator.views.ViewType;
 
@@ -58,7 +62,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements OnPhotoEditorListener, ImageFragment.OnImageListener {
+public class MainActivity extends BaseActivity implements OnPhotoEditorListener, ImageFragment.OnImageListener, FilterFragment.OnFilterListener, BackgroundFragment.OnBackgroundListener, EmojiFragment.OnEmojiListener, StickersFragment.OnStickersListener {
 
     private static final int CAMERA_REQUEST = 52;
     private static final int PICK_REQUEST = 53;
@@ -82,40 +86,77 @@ public class MainActivity extends BaseActivity implements OnPhotoEditorListener,
     private ConstraintLayout mRootView;
 
     private void setupTabIcons() {
+//
+//        int[] tabIcons = {
+//                R.drawable.ic_camera_2,
+//                R.drawable.ic_gallery,
+//                R.drawable.ic_photo_filter,
+//                R.drawable.ic_insert_emoticon,
+////                R.drawable.ic_sticker,
+//        };
+//
+//        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
+//        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
+//        tabLayout.getTabAt(2).setIcon(tabIcons[2]);
+//        tabLayout.getTabAt(3).setIcon(tabIcons[3]);
 
-        int[] tabIcons = {
-                R.drawable.ic_camera_2,
-                R.drawable.ic_gallery,
-                R.drawable.ic_brush,
-                R.drawable.ic_photo_filter,
-                R.drawable.ic_insert_emoticon,
-                R.drawable.ic_sticker,
-        };
+        View view = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        View view1 = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        View view2 = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        View view3 = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
 
-        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
-        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
-        tabLayout.getTabAt(2).setIcon(tabIcons[2]);
-        tabLayout.getTabAt(3).setIcon(tabIcons[3]);
-        tabLayout.getTabAt(4).setIcon(tabIcons[4]);
-        tabLayout.getTabAt(5).setIcon(tabIcons[5]);
+        TextView tvTab = view.findViewById(R.id.tvTitleTab);
+        TextView tvTab1 = view1.findViewById(R.id.tvTitleTab);
+        TextView tvTab2 = view2.findViewById(R.id.tvTitleTab);
+        TextView tvTab3 = view3.findViewById(R.id.tvTitleTab);
+        tvTab.setText("Canvas");
+        tvTab1.setText("Emoji");
+        tvTab2.setText("Filter");
+        tvTab3.setText("Decorate");
+
+        ImageView imgTab = view.findViewById(R.id.imgIconTab);
+        ImageView imgTab1 = view1.findViewById(R.id.imgIconTab);
+        ImageView imgTab2 = view2.findViewById(R.id.imgIconTab);
+        ImageView imgTab3 = view3.findViewById(R.id.imgIconTab);
+
+//        tabLayout.getTabAt(4).setIcon(tabIcons[4]);
 
 //        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
 //        tabOne.setText("ONE");
+
+
 //        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_tab_favourite, 0, 0);
-//        tabLayout.getTabAt(0).setCustomView(tabOne);
+        tabLayout.getTabAt(0).setCustomView(view);
+        tabLayout.getTabAt(1).setCustomView(view1);
+        tabLayout.getTabAt(2).setCustomView(view2);
+        tabLayout.getTabAt(3).setCustomView(view3);
     }
 
 
     private void setupViewPager(ViewPager viewPager) {
         ImageFragment imageFragment = new ImageFragment();
         imageFragment.setImageListener(this);
+
+        FilterFragment filterFragment = new FilterFragment();
+        filterFragment.setFilterListener(this);
+
+        BackgroundFragment backgroundFragment = new BackgroundFragment();
+        backgroundFragment.setBackgroudListener(this);
+
+        EmojiFragment emojiFragment = new EmojiFragment();
+        emojiFragment.setOnEmojiListener(this);
+
+        StickersFragment stickersFragment = new StickersFragment();
+        stickersFragment.setStickersListener(this);
+
+        DecorateFragment decorateFragment = new DecorateFragment();
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(imageFragment, "Canvas");
-        adapter.addFragment(new BackgroundFragment(), "Background");
-        adapter.addFragment(new BrushFragment(), "Brush");
-        adapter.addFragment(new FilterFragment(), "Filter");
-        adapter.addFragment(new EmojiFragment(), "Emoji");
-        adapter.addFragment(new StickersFragment(), "Sticker");
+        adapter.addFragment(emojiFragment, "Emoji");
+        adapter.addFragment(filterFragment, "Filter");
+        adapter.addFragment(decorateFragment, "Decorate");
+//        adapter.addFragment(stickersFragment, "Sticker");
         viewPager.setAdapter(adapter);
     }
 
@@ -462,8 +503,8 @@ public class MainActivity extends BaseActivity implements OnPhotoEditorListener,
 //    }
 
     /*
-   * saves image to camera gallery
-   * */
+     * saves image to camera gallery
+     * */
     private void saveImageToGallery(final Bitmap finalImage) {
         Dexter.withActivity(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .withListener(new MultiplePermissionsListener() {
@@ -605,5 +646,25 @@ public class MainActivity extends BaseActivity implements OnPhotoEditorListener,
                     break;
             }
         }
+    }
+
+    @Override
+    public void onFilterChoose(PhotoFilter photoFilter) {
+        mPhotoEditor.setFilterEffect(photoFilter);
+    }
+
+    @Override
+    public void onBackgroundChoose() {
+
+    }
+
+    @Override
+    public void onEmojiClick(String emojiUnicode) {
+        mPhotoEditor.addEmoji(emojiUnicode);
+    }
+
+    @Override
+    public void onStickerClick(Bitmap bitmap) {
+        mPhotoEditor.addImage(bitmap);
     }
 }

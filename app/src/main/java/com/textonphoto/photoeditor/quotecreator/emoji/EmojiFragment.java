@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.textonphoto.photoeditor.quotecreator.R;
 
-public class EmojiFragment extends Fragment {
+public class EmojiFragment extends Fragment implements EmojiAdapter.OnEmojiClickListener {
 
     private OnEmojiListener onEmojiListener;
 
@@ -50,6 +50,7 @@ public class EmojiFragment extends Fragment {
         LinearLayoutManager layoutEditManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         emojiRecyclerView.setLayoutManager(layoutEditManager);
         emojiRecyclerView.setHasFixedSize(true);
+        emojiAdapter.setEmojiListener(this);
         //This listener will change the text fonts when clicked on any fonts
         emojiRecyclerView.setAdapter(emojiAdapter);
 
@@ -64,8 +65,15 @@ public class EmojiFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onEmojiClick(String textContent) {
+        if (onEmojiListener != null) {
+            onEmojiListener.onEmojiClick(textContent);
+        }
+    }
+
 
     static public interface OnEmojiListener {
-        void onEmojiChoose();
+        void onEmojiClick(String textContent);
     }
 }

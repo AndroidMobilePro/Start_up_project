@@ -1,6 +1,8 @@
 package com.textonphoto.photoeditor.quotecreator.stickers;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,7 +19,15 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.ViewHold
 
     private Context context;
     private LayoutInflater inflater;
-    private OnStickerClickListener onStickerClickListener;
+    private OnStickerClickListener mStickerListener;
+
+
+    int[] stickerList = new int[]{R.drawable.aa, R.drawable.bb,
+            R.drawable.aa, R.drawable.bb, R.drawable.aa, R.drawable.bb,
+            R.drawable.aa, R.drawable.bb, R.drawable.aa, R.drawable.bb, R.drawable.aa,
+            R.drawable.bb, R.drawable.aa, R.drawable.bb, R.drawable.aa, R.drawable.bb,
+            R.drawable.aa, R.drawable.bb};
+
 
     public StickerAdapter(@NonNull Context context) {
         this.context = context;
@@ -33,11 +43,12 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.imageView.setImageResource(stickerList[position]);
     }
 
     @Override
     public int getItemCount() {
-        return 20;
+        return stickerList.length;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -46,22 +57,24 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.ViewHold
         public ViewHolder(final View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.image_view);
-//            fontsPickerView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (onTextPickerClickListener != null) {
-//                        onTextPickerClickListener.onTextPickerClickListener(fonts.get(getAdapterPosition()));
-//                    }
-//                }
-//            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mStickerListener != null) {
+                        mStickerListener.onStickerClick(
+                                BitmapFactory.decodeResource(itemView.getContext().getResources(),
+                                        stickerList[getLayoutPosition()]));
+                    }
+                }
+            });
         }
     }
 
     public void setStickerListener(OnStickerClickListener onStickerClickListener) {
-        this.onStickerClickListener = onStickerClickListener;
+        this.mStickerListener = onStickerClickListener;
     }
 
     public interface OnStickerClickListener {
-        void onStickerClickListener(String textContent);
+        void onStickerClick(Bitmap bitmap);
     }
 }

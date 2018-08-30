@@ -1,5 +1,6 @@
 package com.textonphoto.photoeditor.quotecreator.stickers;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,7 +13,7 @@ import android.widget.Toast;
 
 import com.textonphoto.photoeditor.quotecreator.R;
 
-public class StickersFragment extends Fragment {
+public class StickersFragment extends Fragment implements StickerAdapter.OnStickerClickListener {
 
     private OnStickersListener onStickersListener;
 
@@ -51,6 +52,8 @@ public class StickersFragment extends Fragment {
         LinearLayoutManager layoutEditManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         stickerRecyclerView.setLayoutManager(layoutEditManager);
         stickerRecyclerView.setHasFixedSize(true);
+
+        stickerAdapter.setStickerListener(this);
         //This listener will change the text fonts when clicked on any fonts
         stickerRecyclerView.setAdapter(stickerAdapter);
 
@@ -64,8 +67,15 @@ public class StickersFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStickerClick(Bitmap bitmap) {
+        if (onStickersListener != null) {
+            onStickersListener.onStickerClick(bitmap);
+        }
+    }
+
 
     static public interface OnStickersListener {
-        void onStickersChoose();
+        void onStickerClick(Bitmap bitmap);
     }
 }
