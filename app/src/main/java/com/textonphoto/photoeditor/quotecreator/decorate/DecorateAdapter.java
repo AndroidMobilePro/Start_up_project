@@ -20,6 +20,8 @@ public class DecorateAdapter extends RecyclerView.Adapter<DecorateAdapter.ViewHo
     private LayoutInflater inflater;
     private OnBackgroundClickListener onBackgroundClickListener;
 
+    private String title[] = new String[]{"Ảnh", "Sticker", "Nhãn", "Ảnh bìa", "Vẽ"};
+
     public DecorateAdapter(@NonNull Context context) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
@@ -38,7 +40,7 @@ public class DecorateAdapter extends RecyclerView.Adapter<DecorateAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return 20;
+        return 5;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

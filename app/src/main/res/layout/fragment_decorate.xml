@@ -8,14 +8,30 @@
     android:background="@android:color/white"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/txtCurrentTool"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tabGravity="fill"
+        app:tabIndicatorHeight="0dp"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="@color/colorTextHeaderSelect"
+        app:tabTextColor="@color/colorTextHeader" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvConstraintTools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/tool_bg"
+        android:background="@color/white"
         android:orientation="horizontal"
         android:paddingBottom="4dp"
         android:paddingTop="4dp"
+        android:visibility="gone"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/txtCurrentTool"
